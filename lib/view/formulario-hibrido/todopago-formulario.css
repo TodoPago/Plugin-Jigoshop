@@ -1,0 +1,29 @@
+.tp-modal-class {
+
+}
+.tp-modal-content {
+
+}
+#tp-logo{
+	background-image: url("images/logo.png");
+	background-repeat: no-repeat;
+	height:40px;
+	width:110px;
+	margin: 12px 0 4px 14px;
+}
+#tp-content-form .dateFields input{
+	width:45%;
+}
+#tp-content-form #codigoSeguridadTxt{
+
+}
+.tp-spacer{
+	/*margin:14px -5px 0 9px;*/
+	float: center;
+}
+.tp-right{
+	float: right;
+}
+.tp-label{
+	font-style: italic;
+}
