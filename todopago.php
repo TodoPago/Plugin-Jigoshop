@@ -1,7 +1,8 @@
 <?php
-if (isset($_GET['Answer'])){
+if(isset($_GET['Answer']) || isset($_GET['Error'])) {
     require_once('../../../wp-load.php');
 }
+
 /** Requiere Sdk de TodoPago **/
 require_once('lib/vendor/autoload.php');
 require_once('lib/todopagopayment.php');
@@ -51,7 +52,6 @@ Plugin Name: Jigoshop - Todopago Payment Gateway
 en la orden del pedido **/
 function todopago_meta_boxes()
 {
-
     add_meta_box('todopago-order', "TodoPago pedidos", 'todopago_panel', 'shop_order', 'normal', 'default');
 }
 
@@ -60,6 +60,7 @@ function todopago_panel()
 
     include_once('lib/view/todopago_panel.php');
 }
+
 
 /**
  * Add the gateway to JigoShop
@@ -81,9 +82,10 @@ function getCredentials($datos)
   //  $instance    = new Admin_Data();
     $merchantId  = $todopagopayment->merchantid;
     $security = $todopagopayment->security;
-    $http_header = array();
+
     try {
-        $connector    = new Sdk($http_header, $_POST['mode']);
+  $http_header = array();
+        $connector = new Sdk($http_header, $_POST['mode']);
         $userInstance = new User($_POST['user'], $_POST['password']);
         $rta          = $connector->getCredentials($userInstance);
 
@@ -194,7 +196,7 @@ function getStatus($datos)
         $connector    = new Sdk($http_header,  get_option('todopago_environment'));
 
         $options = array(
-            "Security" => $security, // API Key del comercio asignada por TodoPago 
+            "Security" => $security, // API Key del comercio asignada por TodoPago
             "Merchant" => $merchantId, // Merchant o Nro de comercio asignado por TodoPago
             "RequestKey" => $requestKey, // RequestKey devuelto como respuesta del servicio SendAutorizeRequest
             "AMOUNT" => $_POST['amount'] // Opcional. Monto a devolver, si no se envía, se trata de una devolución total
@@ -207,9 +209,21 @@ function getStatus($datos)
         $logger->info('Devolucion Parcial Response:'. json_encode($resp));
 
         echo json_encode($resp);
-		exit;
+	  	exit;
     }
 
+function cargaCostoFinanciero($operation_id)
+{
+  global $wpdb;
+   $total_amount = get_option('AMOUNTBUYER'.$operation_id);
+
+  $results = $wpdb->get_results( 'SELECT * FROM wp_postmeta WHERE post_id = '.$operation_id.'', OBJECT );
+  $results = unserialize($results[0]->meta_value);
+  $results['order_total']=$total_amount;
+  $serialized_array=serialize($results);
+  $sql = "UPDATE `wp_postmeta` SET `meta_value` = '".$serialized_array."' WHERE `meta_key` = 'order_data' AND `post_id` = '".$operation_id."'";
+  $wpdb->query($sql);
+}
 
 function jigoshop_todopagopayment()
 {
@@ -226,53 +240,55 @@ function jigoshop_todopagopayment()
     $operationId = $_GET['post'];
 
 }
+if(isset($_GET['Error'])) {
+      require_once('../../../wp-load.php');
+  add_filter('show_admin_bar', '__return_false');
+
+  get_header();
+             ?>
+  <article id="error-message" class="type-page status-publish hentry" style="width:666px;">
+      <header class="entry-header">
+      </header>
+      <?php if (isset($_GET['Error'])){ echo '<p>' . $_GET['Error'] .'</p>';}?>
+      <div class="button-alt"> <a href=" <?php  echo get_home_url();  ?>" style="color:white">Volver al inicio</a></div>
+    <div class="button-alt"> <a href=" <?php  echo get_home_url(). '/index.php/cart';  ?>" style="color:white">Ir al carrito de compras</a></div>
+      <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+  </article>
+  <?php
+  get_footer();
+
+}
+
 if (isset($_GET['Answer'])) {
+
     include('../../../wp-config.php');
     require_once('../../../wp-load.php');
 
     $todopagopayment = new todopagopayment();
     $response_GAA = $todopagopayment->call_GAA();
 
+    cargaCostoFinanciero($response_GAA['Payload']['Request']['OPERATIONID']);
+
     if ($response_GAA['StatusCode'] == '-1') {
-         echo $response_GAA;
              header('Location: ../../../index.php/checkout/thanks');
              exit;
     } else {
-        require_once('../../../wp-load.php');
-    add_filter('show_admin_bar', '__return_false');
+      require_once('../../../wp-load.php');
+  add_filter('show_admin_bar', '__return_false');
 
-    get_header();
-               ?>
-    <article id="error-message" class="type-page status-publish hentry" style="width:666px;">
-        <header class="entry-header">
-            <h2>Error en la transacción, no se pudo realizar el pago.</h2>
-        </header>
-        <?php if (isset($response_GAA['StatusMessage'])){ echo '<p>' . $response_GAA['StatusMessage'] .'</p>';}?>
-        <div class="button-alt"> <a href=" <?php  echo get_home_url();  ?>" style="color:white">Volver al inicio</a></div>
-      <div class="button-alt"> <a href=" <?php  echo get_home_url(). '/index.php/shop';  ?>" style="color:white">Ir al carrito de compras</a></div>
-        <br/>
-        <br/>
-        <br/>
-        <br/>
-        <br/>
-        <br/>
-        <br/>
-        <br/>
-        <br/>
-        <br/>
-        <br/>
-        <br/>
-        <br/>
-        <br/>
-        <br/>
-        <br/>
-        <br/>
-        
-    </article>
-    <?php
-    get_header();
-    get_footer();
-  
+  get_header();
+             ?>
+  <article id="error-message" class="type-page status-publish hentry" style="width:666px;">
+      <header class="entry-header">
+      </header>
+      <?php if (isset($response_GAA['StatusMessage'])){ echo '<p>' . $response_GAA['StatusMessage'] .'</p>';}?>
+      <div class="button-alt"> <a href=" <?php  echo get_home_url();  ?>" style="color:white">Volver al inicio</a></div>
+    <div class="button-alt"> <a href=" <?php  echo get_home_url(). '/index.php/cart';  ?>" style="color:white">Ir al carrito de compras</a></div>
+      <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+  </article>
+  <?php
+  get_footer();
+
     }
 }
 

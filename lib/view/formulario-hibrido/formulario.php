@@ -1,97 +1,109 @@
-<?php	
+<?php
 if ($this->todopago_environment == "prod"){
 ?>
 	<script type="text/javascript" src="https://forms.todopago.com.ar/resources/TPHybridForm-v0.1.js"></script>
 <?php
 }else{
 ?>
-<script type="text/javascript" src="https://developers.todopago.com.ar/resources/TPHybridForm-v0.1.js"></script>
+	<script type="text/javascript" src="https://developers.todopago.com.ar/resources/TPHybridForm-v0.1.js"></script>
 <?php
-}			
-echo "<div id='formualrio_hibrido' class='table-responsive' >";
-echo "<table class='table table-bordered table-hover'>";
-echo ' <tr>';
-echo '<td colspan="2">';
-echo '<div id="tp-logo"></div>';
-echo '<p class="tp-label">Elegí tu forma de pago </p>';
-echo '</td>';
-echo '</tr>';
-echo '<tbody>';
-echo ' <tr>';
-echo '  <td>';
-echo '   <div>';
-echo '     <select id="formaDePagoCbx" class="form-control"></select>';
-echo ' </div>';
-echo '</td>';
-echo ' <td>';
-echo '     <div>';
-echo ' <select id="bancoCbx" class="form-control"></select>';
-echo '  </div>';
-echo ' </td>';
-echo ' </tr>';
-echo '<tr>';
-echo '<td colspan="2">';
-echo ' <div>';
-echo '<select id="promosCbx" class="form-control"></select>';
-echo '<label id="labelPromotionTextId" class="left"></label>';
-echo '</div>';
-echo '</td>';
-echo '  </tr>';
-echo ' <tr>';
-echo '  <td>';
-echo ' <div>';
-echo '  <input id="numeroTarjetaTxt"  class="form-control left" />';
-echo ' </div>';
-echo '</td>';
-echo '<td>';
-echo ' <div>';
-echo '  <input id="codigoSeguridadTxt" class="form-control left" />';
-echo ' </div>';
-echo ' <div>';
-echo '<label id="labelCodSegTextId" ></label>';
-echo '</div>';
-echo '</td>';
-echo '</tr>';
-echo '<tr>';
-echo ' <td colspan="2">';
-echo '  <input id="mesTxt" >';
-echo ' /';
-echo ' <input id="anioTxt" >';
-echo '</td>';
-echo '  </tr>';
-echo ' <tr>';
-echo '  <td colspan="2">';
-echo ' <div>';
-echo '     <input id="apynTxt" class="left form-control" />';
-echo ' </div>';
-echo '</td>';
-echo '</tr>';
-echo ' <tr>';
-echo '  <td>';
-echo ' <select id="tipoDocCbx" class="form-control" ></select>';
-echo '</td>';
-echo ' <td>';
-echo '   <input id="nroDocTxt" class="form-control" />	';
-echo '</td>';
-echo '</tr>';
-echo '<tr>';
-echo '<td colspan="2">';
-echo '<div >';
-echo '<input id="emailTxt" class="left form-control" /><br/>';
-echo '</div>';
-echo '  </td>';
-echo ' </tr>';
-echo ' </tbody>';
-echo '<tfoot>';
-echo ' </tfoot>';
-echo ' </table>';
-echo '<div  class="pull-right">';
-echo "<input type='button' class='btn btn-primary' id='MY_btnConfirmarPago' class='button' echo value='Pagar'/>";
-echo ' </div>';
-echo '</div>';
-                
-?>
+} ?>
+
+<div id='formualrio_hibrido' class='table-responsive' >
+<table class='table table-bordered table-hover'>
+	<tr>
+		<td colspan="2">
+			<div id="tp-logo"></div>
+			<p class="tp-label">Elegí tu forma de pago </p>
+		</td>
+	</tr>
+<tbody>
+	<tr>
+		<td>
+			<div>
+			<select id="formaDePagoCbx" class="form-control"></select>
+			</div>
+		</td>
+		<td>
+			<div>
+			<select id="bancoCbx" class="form-control"></select>
+			</div>
+		</td>
+ 	</tr>
+	<tr>
+		<td colspan="2">
+			<div>
+			<select id="promosCbx" class="form-control"></select>
+			<label id="labelPromotionTextId" class="left"></label>
+			</div>
+		</td>
+	</tr>
+  	<tr><!-- Para los casos en el que el comercio opera con PEI -->
+		<td>
+			<label id="labelPeiCheckboxId"></label>
+			<input id="peiCbx"/>
+		</td>
+ 	</tr>
+	<tr>
+		<td>
+			<div>
+			<input id="numeroTarjetaTxt"  class="form-control left" />
+			</div>
+		</td>
+		<td>
+			<div>
+			<input id="codigoSeguridadTxt" class="form-control left" />
+			</div>
+			<div>
+			<label id="labelCodSegTextId" ></label>
+			</div>
+		</td>
+	</tr>
+	<tr>
+		<td colspan="2">
+			<input id="mesTxt" >
+			/
+			<input id="anioTxt" >
+		</td>
+	</tr>
+	<tr>
+		<td colspan="2">
+			<div><input id="apynTxt" class="left form-control" /></div>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<select id="tipoDocCbx" class="form-control" ></select>
+		</td>
+		<td>
+			<input id="nroDocTxt" class="form-control" />
+		</td>
+	</tr>
+	<tr>
+		<td colspan="2">
+			<div ><input id="emailTxt" class="left form-control" /><br/></div>
+		</td>
+	</tr>
+	<tr>
+		<td colspan="2">
+			<!-- Para los casos en el que el comercio opera con PEI -->
+			<label id="labelPeiTokenTextId"></label>
+			<input id="peiTokenTxt"/>
+		</td>
+	</tr>
+</tbody>
+<tfoot>
+</tfoot>
+</table>
+
+<div  class="pull-right">
+<input type='button' class='btn btn-primary' id='MY_btnConfirmarPago' class='tp-button button alt' value="Pagar"/>
+<input type='button' class='btn btn-primary' id='MY_btnPagarConBilletera' class='tp-button button alt' value="Pagar con Billetera" />
+</div>
+</div>
+
 <script>
+
 	/************* CONFIGURACION DEL API ************************/
 	window.TPFORMAPI.hybridForm.initForm({
 		callbackValidationErrorFunction: 'validationCollector',
@@ -129,8 +141,11 @@ echo '</div>';
 	}
 
 	function billeteraPaymentResponse(response) {
-		console.log("My wallet callback");
-		console.log(response.ResultCode + " : " + response.ResultMessage);
+		if(response.AuthorizationKey)
+			document.location = "<?php echo "$return_URL_OK&Answer="; ?>" + response.AuthorizationKey;
+		else
+			document.location = "<?php echo "$return_URL_OK&Error="; ?>" + response.ResultMessage;
+
 	}
 
 	function customPaymentSuccessResponse(response) {
@@ -140,9 +155,10 @@ echo '</div>';
 	}
 
 	function customPaymentErrorResponse(response) {
-		console.log("Mi custom payment error callback");
-		console.log(response.ResultCode + " : " + response.ResultMessage);
-		document.location = "<?php echo "$return_URL_ERROR&Answer="; ?>" + response.AuthorizationKey;
+		if(response.AuthorizationKey)
+			document.location = "<?php echo "$return_URL_OK&Answer="; ?>" + response.AuthorizationKey;
+		else
+			document.location = "<?php echo "$return_URL_OK&Error="; ?>" + response.ResultMessage;
 	}
 
 	function initLoading() {
@@ -162,5 +178,3 @@ echo '</div>';
 		margin: 0 0 0 14px;
 	}
 </style>
-
-    
