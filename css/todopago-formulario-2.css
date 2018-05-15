@@ -1,0 +1,17 @@
+/* Sobreescrituras a JIGO */
+.wrap{
+    max-width: none !important;
+    padding-left: 10% !important;
+    padding-right: 10% !important;
+}
+
+.jigoshop .site-content{
+    width: 100% !important;
+}
+
+.entry-content{
+    width: 100% !important;
+}
+/* /Sobreescrituras a JIGO */
+
+

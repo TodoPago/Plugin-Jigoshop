@@ -168,7 +168,7 @@ $var = $user->user_pass;
 
             $name_array[] = str_replace('#', '', $cart_item_array['name']);
             $sku_array[] = str_replace('#', '', empty($sku) ? $cart_item_array['id'] : $sku);
-            $totalamount_array[] = number_format($cart_item_array['cost_inc_tax'],2,".","");
+            $totalamount_array[] = number_format( $cart_item_array['cost_inc_tax'] * $cart_item_array['qty'] ,2,".","");
             $quantity_array[] = $cart_item_array['qty'];
             $price_array[] = number_format($cart_item_array['cost'],2,".","");
 		}

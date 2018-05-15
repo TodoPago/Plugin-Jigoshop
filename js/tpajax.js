@@ -25,14 +25,11 @@ jQuery(document).ready(function() {
     jQuery("#jigoshop_todopagopayment_btncredentials_dev").attr("value",
         "obtener credenciales");
     jQuery("#jigoshop_todopagopayment_btncredentials_dev").click(function() {
-
-
-
         var user = jQuery("#jigoshop_todopagopayment_user_dev").val();
         var password = jQuery(
             "#jigoshop_todopagopayment_password_dev").val();
         //var mode = jQuery("#jigoshop_todopagopayment_mode").val();
-        getCredentials(user, password, 'test');
+        getCredentials(user, password, 'test', jQuery("#jigoshop_todopagopayment_value_check_wpnonce").val());
     });
 
     jQuery("#jigoshop_todopagopayment_btncredentials_prod").attr("type",
@@ -41,6 +38,7 @@ jQuery(document).ready(function() {
         "obtener credenciales");
 
     jQuery("#jigoshop_todopagopayment_btncredentials_prod").click(function() {
+        console.log('nonce: '+jQuery("#jigoshop_todopagopayment_value_check_wpnonce").val());
 
 
         var user = jQuery("#jigoshop_todopagopayment_user_prod").val();
@@ -48,7 +46,7 @@ jQuery(document).ready(function() {
             "#jigoshop_todopagopayment_password_prod").val();
         //var mode = jQuery("#jigoshop_todopagopayment_mode").val();
 
-        getCredentials(user, password, 'prod');
+        getCredentials(user, password, 'prod', jQuery("#jigoshop_todopagopayment_value_check_wpnonce").val());
     });
 
 
@@ -64,9 +62,14 @@ jQuery(document).ready(function() {
         voidRequest();
     });
     jQuery("#jigoshop_todopagopayment_btnDevolutionPartial").click(function() {
+        voidRequest();
+    });    
+    /*
+    jQuery("#jigoshop_todopagopayment_btnDevolutionPartial").click(function() {
         var amount = jQuery("#jigoshop_todopagopayment_amount").val();
         returnRequest(amount);
     });
+    */
 
 
     jQuery("#jigoshop_todopagopayment_maxinstallments_enabled").click(function() {
@@ -85,10 +88,12 @@ jQuery(document).ready(function() {
             jQuery("#jigoshop_todopagopayment_timeout").attr('disabled', 'disabled');
         }
     });
+
+    jQuery("#jigoshop_todopagopayment_value_check_wpnonce").hide();
 });
 
 /** Metodos Credenciales **/
-function getCredentials(user, password, mode) {
+function getCredentials(user, password, mode, wpnonce) {
 
     jQuery.ajax({
         type: 'POST',
@@ -97,9 +102,12 @@ function getCredentials(user, password, mode) {
             'action': 'todopago_credentials',
             'user': user,
             'password': password,
-            'mode': mode
+            'mode': mode,
+            '_wpnonce' : wpnonce
         },
         success: function(data) {
+            console.log('Resultado: '+data);
+
             jQuery('#jigoshop_todopagopayment_password_dev').val('');
             jQuery('#jigoshop_todopagopayment_password_prod').val('');
             console.log('dio todo ok! ');
@@ -109,7 +117,7 @@ function getCredentials(user, password, mode) {
             str = Java_to_Latin1(str);
 
             resultMessage = str.split(":");
-            console.log(resultMessage);
+            console.log('En getCredentials - Resultado que llegó ' + resultMessage);
 
             if (resultMessage && resultMessage != '' && resultMessage[0] == 'mensajeResultado') {
                 alert(resultMessage[1]);
@@ -138,19 +146,22 @@ function getCredentials(user, password, mode) {
 }
 
 function setCredentials(data, mode) {
-
     var response = JSON.parse(data);
+    //var response = data;
+    console.log('en setCredentials - '+response);
+
+    console.log('en setCredentials - '+response.apikey);
 
     //  var security = response.ApiKey.substring(9, 42);
     if (mode == 'test') {
-        jQuery("#jigoshop_todopagopayment_authorization_dev").val(response.ApiKey);
-        jQuery("#jigoshop_todopagopayment_merchantid_dev").val(response.merchantId);
+        jQuery("#jigoshop_todopagopayment_authorization_dev").val(response.apikey);
+        jQuery("#jigoshop_todopagopayment_merchantid_dev").val(response.merchandid);
         jQuery("#jigoshop_todopagopayment_security_dev").val(response.security);
         jQuery("#jigoshop_todopagopayment_password_dev").val('');
 
     } else {
-        jQuery("#jigoshop_todopagopayment_authorization_prod").val(response.ApiKey);
-        jQuery("#jigoshop_todopagopayment_merchantid_prod").val(response.merchantId);
+        jQuery("#jigoshop_todopagopayment_authorization_prod").val(response.apikey);
+        jQuery("#jigoshop_todopagopayment_merchantid_prod").val(response.merchandid);
         jQuery("#jigoshop_todopagopayment_security_prod").val(response.security);
         jQuery("#jigoshop_todopagopayment_password_prod").val('');
     }
@@ -163,6 +174,7 @@ function getStatus(datos) {
     var merchantId = datosJson.merchantId;
     var operationId = datosJson.operationId;
 
+
     jQuery.ajax({
         type: 'POST',
         url: "../wp-admin/admin-ajax.php",
@@ -172,6 +184,8 @@ function getStatus(datos) {
             'operationId': operationId
         },
         success: function(data) {
+          //console.log(data);
+
             setStatus(data);
         },
         error: function(xhr, ajaxOptions, thrownError) {
@@ -194,8 +208,12 @@ function getStatus(datos) {
 }
 
 function setStatus(data) {
-        response = JSON.parse(data);
+        //response = JSON.parse(data);
+        console.log('respuesta: ' + data);
+        jQuery("#tp_get_status_html_completo").html(data );
 
+
+        /*
         if(response !=''){
             jQuery("#amount-buyer").html(response.Operations.AMOUNTBUYER);
             jQuery("#authorization-code").html(response.Operations.AUTHORIZATIONCODE);
@@ -238,7 +256,8 @@ function setStatus(data) {
             jQuery("#service-charge-amount").html(response.Operations.SERVICECHARGEAMOUNT);
             jQuery("#tax-amount").html(response.Operations.TAXAMOUNT);
             jQuery("#tax-amount-buyer").html(response.Operations.TAXAMOUNTBUYER);
-
+            jQuery("#cft").html(response.Operations.CFT);
+            jQuery("#tea").html(response.Operations.TEA);
 
             var refunds = response.Operations.REFUNDS;
             strRefunds = JSON.stringify(refunds);
@@ -287,6 +306,8 @@ function setStatus(data) {
         //error_message
         jQuery("#error_message").css("display", "block").html("La operacion no esta registrada");
     }
+    */
+
 }
 
 /** Metodos devoluciones **/
@@ -296,10 +317,11 @@ function voidRequest() {
         type: 'POST',
         url: "../wp-admin/admin-ajax.php",
         data: {
-            'action': 'todopago_voidRequest'
-
+            'action': 'todopago_voidRequest',
+            'amount': jQuery('#jigoshop_todopagopayment_amount').val()
         },
         success: function(data) {
+            console.log('Enviando setVoidRequest: ' + data);
             setVoidRequest(data);
         },
         error: function(xhr, ajaxOptions, thrownError) {

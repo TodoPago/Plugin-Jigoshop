@@ -21,12 +21,13 @@
     <h2>Otros cargos: </h2><input type="text" id="jigoshop_todopagopayment_amount" placeholder=$<?php echo $recargo ?> style="border:1px solid #8BA870" class="text" disabled>
     <br />
     <br />
+    <div id="tp_get_status_html_completo"></div>
     <table style="display:none" id="getStatus_table">
         <tr>
             <td>Result code</td> <td id="result-code"></td>
         </tr>
         <tr>
-            <td>Mensaje key</td> <td id="result-message"></td>
+            <td>ResultMessage</td> <td id="result-message"></td>
         </tr>
         <tr>
             <td>Date time</td> <td id="date-time"></td>
@@ -138,6 +139,12 @@
         </tr>
         <tr>
             <td>Refunds</td><td id="refunds"></td>
+        </tr>
+        <tr>
+            <td>CFT</td><td id="cft"></td>
+        </tr>
+        <tr>
+            <td>TEA</td><td id="tea"></td>
         </tr>
     </table>
     <div>
