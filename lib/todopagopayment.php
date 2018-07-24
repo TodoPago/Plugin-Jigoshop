@@ -7,7 +7,7 @@ require_once(dirname(__FILE__) . '/StatusCodeCS.php');
 require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 
 
-define('TODOPAGO_PLUGIN_VERSION', '1.6.0');
+define('TODOPAGO_PLUGIN_VERSION', '1.7.0');
 define('TP_FORM_EXTERNO', 'ext');
 define('TP_FORM_HIBRIDO', 'hib');
 define('TODOPAGO_DEVOLUCION_OK', 2011);
@@ -57,7 +57,7 @@ class todopagopayment extends jigoshop_payment_gateway
         $this->enabled          = Jigoshop_Base::get_options()->get_option('jigoshop_todopagopayment_enabled');
         $this->title            = "Todo Pago";
         $this->description      = Jigoshop_Base::get_options()->get_option('jigoshop_todopagopayment_description');
-        $this->icon             = plugins_url() . '/' . plugin_basename(dirname(__FILE__)) . '/../src/logo.png';
+        $this->icon             = "https://todopago.com.ar/sites/todopago.com.ar/files/pluginstarjeta.jpg";
         $this->instant          = Jigoshop_Base::get_options()->get_option('jigoshop_todopagopayment_instant');
         $this->language         = Jigoshop_Base::get_options()->get_option('jigoshop_todopagopayment_language');
 
@@ -218,7 +218,9 @@ class todopagopayment extends jigoshop_payment_gateway
 
         $opcionales = $this->buildOpcionales();
         $config->setArrayOpcionales($opcionales);
-
+        
+        $config->setIsBilletera(get_class($this));
+        
         $this->core->setTpLogger($this->tplogger);
         $this->core->setConfigModel($config);   
     }
@@ -267,7 +269,7 @@ class todopagopayment extends jigoshop_payment_gateway
                 $this->settings['timeout_enabled']="si";
             }
 
-
+            
 
             $opcionales = Array();
             $opcionalesBenchmark = array(
@@ -343,6 +345,8 @@ class todopagopayment extends jigoshop_payment_gateway
 
     protected function get_default_options()
     {
+        $class_name = get_class($this);
+        if($class_name != "todopagopaymentbilletera") 
         apply_filters('todopago_github_update', self::TP_PLUGIN_GITHUB_API, self::TP_PLUGIN_GITHUB_REPO);
 
         $defaults[] = array(
@@ -418,7 +422,7 @@ class todopagopayment extends jigoshop_payment_gateway
 
         // List each option in order of appearance with details
         $defaults[] = array(
-            'name' => __('Habilitar Todopago', 'jigoshop'),
+            'name' => __('Habilitar Todo Pago', 'jigoshop'),
             'desc' => '',
             'tip' => '',
             'id' => 'jigoshop_todopagopayment_enabled',
@@ -671,6 +675,20 @@ class todopagopayment extends jigoshop_payment_gateway
                 'yes' => __('Yes', 'jigoshop')
             )
         );
+        $defaults[] = array(
+            'name' => __('Billetera en Checkout', 'jigoshop'),
+            'desc' => '',
+            'tip' => __('Seleccione el banner que desea mostrar para billetera.', 'jigoshop'),
+            'id' => 'jigoshop_todopagopayment_billetera',
+            'type' => 'radio',
+            'extra' => array('vertical'),
+            'choices' => array(
+                'https://todopago.com.ar/sites/todopago.com.ar/files/billetera/pluginstarjeta1.jpg' => __('<img src="https://todopago.com.ar/sites/todopago.com.ar/files/billetera/pluginstarjeta1.jpg" style="vertical-align: middle;">', 'jigoshop'),
+                'https://todopago.com.ar/sites/todopago.com.ar/files/billetera/pluginstarjeta2.jpg' => __('<img src="https://todopago.com.ar/sites/todopago.com.ar/files/billetera/pluginstarjeta2.jpg" style="vertical-align: middle;">', 'jigoshop'),
+                'https://todopago.com.ar/sites/todopago.com.ar/files/billetera/pluginstarjeta3.jpg' => __('<img src="https://todopago.com.ar/sites/todopago.com.ar/files/billetera/pluginstarjeta3.jpg" style="vertical-align: middle;">', 'jigoshop'),
+            ),
+        );
+
         $defaults[] = array(
             'name' => __('Timeout', 'jigoshop'),
             'desc' => '',

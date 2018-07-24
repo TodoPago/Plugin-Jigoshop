@@ -14,4 +14,18 @@
 }
 /* /Sobreescrituras a JIGO */
 
+#codigoSeguridadTxt::-webkit-input-placeholder { /* WebKit browsers */
+    font-size: 1em !important;
+}
 
+#codigoSeguridadTxt:-moz-placeholder { /* Mozilla Firefox*/
+    font-size: 1em !important;
+}
+
+#codigoSeguridadTxt::-moz-placeholder { /* Mozilla Firefox otras versiones */
+    font-size: 1em !important;
+}
+
+#codigoSeguridadTxt:-ms-input-placeholder { /* Internet Explorer*/
+    font-size: 1em !important;
+}

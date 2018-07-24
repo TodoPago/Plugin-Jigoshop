@@ -6,6 +6,7 @@ if (isset($_GET['Answer']) || isset($_GET['Error'])) {
 /** Requiere Sdk de TodoPago **/
 require_once('lib/vendor/autoload.php');
 require_once('lib/todopagopayment.php');
+require_once('lib/todopagopaymentbilletera.php');
 require_once(dirname(__FILE__) . '/lib/logger.php');
 include_once(dirname(__FILE__) . '/../jigoshop/admin/jigoshop-install.php');
 register_activation_hook(__FILE__, 'install');
@@ -133,7 +134,11 @@ function add_todopagopayment_gateway($methods)
     $methods[] = 'todopagopayment';
     return $methods;
 }
-
+function add_todopagopaymentbilletera_gateway($methods)
+{
+    $methods[] = 'todopagopaymentbilletera';
+    return $methods;
+}
 /*
  *  TodoPago Obtener Credenciales
  */
@@ -377,7 +382,8 @@ function jigoshop_todopagopayment()
 	*/
 	
 	if( $_POST["option_page"]=="jigoshop_options" ){
-		add_filter('jigoshop_payment_gateways', 'add_todopagopayment_gateway', 50);
+        add_filter('jigoshop_payment_gateways', 'add_todopagopayment_gateway', 50);
+        add_filter('jigoshop_payment_gateways', 'add_todopagopaymentbilletera_gateway', 50);
 	}else{ //No está modificando el formulario de config
 		if(!$_POST['action']){ 
 			//echo "entró en if de funcion jigoshop_todopagopayment";
@@ -388,7 +394,9 @@ function jigoshop_todopagopayment()
 			*/
 			//echo "Add action";
 			add_filter('jigoshop_payment_gateways', 'add_todopagopayment_gateway', 50);
-			/*
+            add_filter('jigoshop_payment_gateways', 'add_todopagopaymentbilletera_gateway', 50);
+			
+            /*
 			echo "después de add filter";
 			die;
 			*/
@@ -421,6 +429,8 @@ if (isset($_GET['Error'])) {
       <?php
     if (isset($_GET['Error'])) {
         echo '<p>' . $_GET['Error'] . '</p>';
+        echo '<p>Orden #' . $_SESSION['Order']->id . '</p>';
+
         $flagMensajeErrorMostrado=true;
     }
 
@@ -470,7 +480,37 @@ if (isset($_GET['Answer']) AND $flagMensajeErrorMostrado==false) {
     cargaCostoFinanciero($response_GAA['response_GAA']['Payload']['Request']['OPERATIONID']);
 
     if ($response_GAA['response_GAA']['StatusCode'] == '-1') {
-        header('Location: ../../../index.php/checkout/thanks');
+        //header('Location: ../../../index.php/checkout/thanks');
+        get_header(); ?>
+        <article id="error-message" class="type-page status-publish hentry" style="width:666px;">
+          <header class="entry-header">
+          </header>
+          
+          <p>¡Gracias! Tu orden fue procesada exitosamente.</p>
+          <p>Orden #<?php echo $_SESSION['Order']->id; ?></p>
+
+    
+          <div class="button-alt"> <a href=" <?php echo get_home_url(); ?>" style="color:white">Continuar comprando</a></div>
+
+
+          <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+
+        </article>
+        <?php
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         exit;
     } else {
         require_once('../../../wp-load.php');
@@ -485,6 +525,7 @@ if (isset($_GET['Answer']) AND $flagMensajeErrorMostrado==false) {
       <?php
         if (isset($response_GAA['response_GAA']['StatusMessage'])) {
             echo '<p>' . $response_GAA['response_GAA']['StatusMessage'] . '</p>';
+            echo '<p>Orden #'. $_SESSION['Order']->id . '</p>';
         }
 ?>
       <div class="button-alt"> <a href=" <?php

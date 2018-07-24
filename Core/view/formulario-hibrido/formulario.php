@@ -48,7 +48,7 @@ if (!defined('ABSPATH')) exit; // Exit if accessed directly
         </div>
     </section>
 
-    <section class="billetera_tp">
+    <section class="billetera_tp" id="tpbilletera_bloque">
         <div class="tp-row">
             <p>
                 Con tu tarjeta de crédito o débito
@@ -306,7 +306,8 @@ if (!defined('ABSPATH')) exit; // Exit if accessed directly
     var sliderText = tpformJquery("#slider-text");
     var helperCaller = tpformJquery("#tp-cvv-caller");
     var helperPopover = tpformJquery("#tp-cvv-helper");
-
+    var methodPayment = "<?php echo $config->getPaymentMethod(); ?>";
+    var btnBilletera = document.getElementById('btn_billetera');
 
     var idTarjetas = {
         42: 'VISA',
@@ -390,6 +391,9 @@ if (!defined('ABSPATH')) exit; // Exit if accessed directly
 
     function loader() {
         tpformJquery("#loading-hibrid").css("width", "50%");
+        if(methodPayment == "todopagopaymentbilletera"){
+            document.getElementById("tpbilletera_bloque").style="display:none";
+        }
         setTimeout(function () {
             ignite();
             tpformJquery(".payment-method").hide();
@@ -406,6 +410,8 @@ if (!defined('ABSPATH')) exit; // Exit if accessed directly
 
         setTimeout(function () {
             tpformJquery("#tpForm").fadeTo('fast', 1);
+            if(methodPayment == "todopagopaymentbilletera")
+                btnBilletera.click();
         }, 2200);
     }
 
